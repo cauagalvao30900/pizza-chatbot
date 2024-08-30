@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot em Python</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .chatbox {
+            width: 400px;
+            max-width: 100%;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            padding: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+        }
+        .chatbox h2 {
+            margin: 0;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ccc;
+            text-align: center;
+        }
+        .chatlogs {
+            padding: 10px;
+            height: 300px;
+            overflow-y: scroll;
+            border-bottom: 1px solid #ccc;
+            margin-bottom: 10px;
+        }
+        .chatlogs .chat {
+            margin-bottom: 10px;
+        }
+        .chatlogs .chat .user, .chatlogs .chat .bot {
+            padding: 5px;
+            border-radius: 5px;
+        }
+        .chatlogs .chat .user {
+            background-color: #0084ff;
+            color: white;
+            text-align: right;
+        }
+        .chatlogs .chat .bot {
+            background-color: #f1f0f0;
+            color: black;
+            text-align: left;
+        }
+        .chat-input {
+            display: flex;
+        }
+        .chat-input input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+        .chat-input button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #0084ff;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="chatbox">
+        <h2>Chatbot em Python</h2>
+        <div class="chatlogs" id="chatlogs"></div>
+        <div class="chat-input">
+            <input type="text" id="userInput" placeholder="Digite sua mensagem...">
+            <button onclick="sendMessage()">Enviar</button>
+        </div>
+    </div>
+
+    <script>
+      function sendMessage() {
+    var userInput = document.getElementById("userInput").value;
+    if (userInput.trim() !== "") {
+        var chatlogs = document.getElementById("chatlogs");
+
+        // Mostrar a mensagem do usuário
+        var userMessage = '<div class="chat user">' + userInput + '</div>';
+        chatlogs.innerHTML += userMessage;
+
+        // Enviar a mensagem para o backend
+        fetch("/get", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: "msg=" + encodeURIComponent(userInput)
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Mostrar a resposta do bot
+            var botMessage = '<div class="chat bot">' + data.response + '</div>'; // Alterado aqui
+            chatlogs.innerHTML += botMessage;
+            chatlogs.scrollTop = chatlogs.scrollHeight; // Rolagem automática para a parte inferior
+        })
+        .catch(error => console.error('Error:', error));
+
+        document.getElementById("userInput").value = "";
+    }
+}
+
+    </script>
+</body>
+</html>
